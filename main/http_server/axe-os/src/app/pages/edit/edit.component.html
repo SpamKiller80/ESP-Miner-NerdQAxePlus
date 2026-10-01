@@ -644,6 +644,47 @@
         </div>
     </form>
 
+    <nb-card class="mt-3">
+        <nb-card-header>{{ 'DISPLAY.TITLE' | translate }}</nb-card-header>
+        <nb-card-body>
+            <p class="text-hint">{{ 'DISPLAY.HINT' | translate }}</p>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="label">{{ 'DISPLAY.ACCENT' | translate }}</label>
+                    <nb-select fullWidth [selected]="accentId" (selectedChange)="onAccentChange($event)">
+                        <nb-option *ngFor="let a of accentPresets" [value]="a.id">{{ a.name }}</nb-option>
+                    </nb-select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="label">{{ 'DISPLAY.MAX_CURRENT' | translate }}</label>
+                    <input nbInput fullWidth type="number" min="1" max="100" step="0.1"
+                        placeholder="{{ 'DISPLAY.DEVICE_DEFAULT' | translate }}"
+                        [value]="display.maxCurrentA ?? ''" (input)="onDisplayInput('maxCurrentA', $any($event.target).value)">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="label">{{ 'DISPLAY.MAX_POWER' | translate }}</label>
+                    <input nbInput fullWidth type="number" min="10" max="2000" step="1"
+                        placeholder="{{ 'DISPLAY.DEVICE_DEFAULT' | translate }}"
+                        [value]="display.maxPowerW ?? ''" (input)="onDisplayInput('maxPowerW', $any($event.target).value)">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="label">{{ 'DISPLAY.WARN_PCT' | translate }}</label>
+                    <input nbInput fullWidth type="number" min="50" max="100" step="1"
+                        placeholder="94"
+                        [value]="display.warnPct ?? ''" (input)="onDisplayInput('warnPct', $any($event.target).value)">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="label">{{ 'DISPLAY.CRIT_PCT' | translate }}</label>
+                    <input nbInput fullWidth type="number" min="50" max="100" step="1"
+                        placeholder="98"
+                        [value]="display.critPct ?? ''" (input)="onDisplayInput('critPct', $any($event.target).value)">
+                </div>
+            </div>
+            <button nbButton size="small" status="primary" (click)="saveDisplay()">{{ 'COMMON.SAVE' | translate }}</button>
+            <button nbButton size="small" class="ml-2" (click)="resetDisplay()">{{ 'DISPLAY.RESET' | translate }}</button>
+        </nb-card-body>
+    </nb-card>
+
     <ng-template #warningDialog>
         <nb-card accent="danger" style="width: 384px">
             <nb-card-header style="color: red;">{{ 'WARNINGS.UNSAFE_SETTINGS' | translate }}</nb-card-header>

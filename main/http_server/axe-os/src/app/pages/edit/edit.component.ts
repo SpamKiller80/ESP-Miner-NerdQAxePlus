@@ -10,6 +10,7 @@ import { LocalStorageService } from 'src/app/services/local-storage.service';
 import { OtpAuthService, EnsureOtpResult, EnsureOtpOptions } from '../../services/otp-auth.service';
 import { TranslateService } from '@ngx-translate/core';
 import { ISettingsV2, ISettingsV2Fan } from '../../models/ISettingsV2';
+import { UiPrefsService, ACCENT_PRESETS, DisplayThresholds } from '../../services/ui-prefs.service';
 
 enum SupportLevel { Safe = 0, Advanced = 1, Pro = 2 }
 
@@ -98,7 +99,37 @@ export class EditComponent implements OnInit {
     private dialogService: NbDialogService,
     private otpAuth: OtpAuthService,
     private translate: TranslateService,
-  ) { }
+    private uiPrefs: UiPrefsService,
+  ) {
+    this.display = this.uiPrefs.getThresholds();
+  }
+
+  // ---- Browser-local display settings (not saved to the device) ----
+  public display: DisplayThresholds;
+  public accentPresets = ACCENT_PRESETS;
+  public accentId = this.uiPrefs.getAccentId();
+
+  onDisplayInput(key: keyof DisplayThresholds, value: string) {
+    const v = value.trim() === '' ? null : Number(value);
+    this.display = { ...this.display, [key]: v != null && Number.isFinite(v) ? v : null };
+  }
+
+  saveDisplay() {
+    this.uiPrefs.setThresholds(this.display);
+    this.display = this.uiPrefs.getThresholds();
+    this.toastrService.success(this.translate.instant('DISPLAY.SAVED'), '');
+  }
+
+  resetDisplay() {
+    this.uiPrefs.resetThresholds();
+    this.display = this.uiPrefs.getThresholds();
+    this.toastrService.success(this.translate.instant('DISPLAY.SAVED'), '');
+  }
+
+  onAccentChange(id: string) {
+    this.accentId = id;
+    this.uiPrefs.setAccent(id);
+  }
 
   ngOnInit(): void {
     this.systemService.getSettingsV2(this.uri)

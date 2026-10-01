@@ -68,6 +68,7 @@ import { maxAsicTemp,
   splitHumanReadable,
   toPct,
   isBarWarn,
+  BAR_THRESHOLDS,
   isBarCrit,
   isBarMax,
   BAR_LIMITS,
@@ -89,6 +90,8 @@ import { maxAsicTemp,
   HomeBarDomSync,
   hexToRgba
 } from './tiles/utils';
+import { UiPrefsService } from '../../services/ui-prefs.service';
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -226,7 +229,7 @@ export class HomeComponent implements AfterViewChecked, OnInit, OnDestroy {
     const cfg = HOME_CFG.tiles.inputCurrent;
     const max = Number(maxA);
     const useLow = Number.isFinite(max) && max < Number(cfg.lowMaxAThreshold ?? 8);
-    const warnRel = useLow ? Number(cfg.lowWarnRel ?? 0.98) : Number(cfg.warnRel ?? 0.94);
+    const warnRel = this.uiPrefs.warnRel(useLow ? Number(cfg.lowWarnRel ?? 0.98) : Number(cfg.warnRel ?? 0.94));
     return isBarWarn(currentA, minA, maxA, warnRel);
   }
 
@@ -234,8 +237,17 @@ export class HomeComponent implements AfterViewChecked, OnInit, OnDestroy {
     const cfg = HOME_CFG.tiles.inputCurrent;
     const max = Number(maxA);
     const useLow = Number.isFinite(max) && max < Number(cfg.lowMaxAThreshold ?? 8);
-    const critRel = useLow ? Number(cfg.lowCritRel ?? 0.99) : Number(cfg.critRel ?? 0.98);
+    const critRel = this.uiPrefs.critRel(useLow ? Number(cfg.lowCritRel ?? 0.99) : Number(cfg.critRel ?? 0.98));
     return isBarCrit(currentA, minA, maxA, critRel);
+  }
+
+  /** Power bar (W): same thresholds as the other bars unless overridden in Settings. */
+  public isPowerWarn(watts: any, minW: any, maxW: any): boolean {
+    return isBarWarn(watts, minW, maxW, this.uiPrefs.warnRel(BAR_THRESHOLDS.warnRel));
+  }
+
+  public isPowerCrit(watts: any, minW: any, maxW: any): boolean {
+    return isBarCrit(watts, minW, maxW, this.uiPrefs.critRel(BAR_THRESHOLDS.critRel));
   }
 
   /** Voltage Regulator temperature bands (yellow/red) are configured in HOME_CFG. */
@@ -622,7 +634,8 @@ export class HomeComponent implements AfterViewChecked, OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private dialogService: NbDialogService,
-    private toastrService: NbToastrService
+    private toastrService: NbToastrService,
+    private uiPrefs: UiPrefsService
   ) {
     // Local persistence wrapper for chart state/settings
     this.chartStorage = new HomeChartStorage({
@@ -778,6 +791,9 @@ export class HomeComponent implements AfterViewChecked, OnInit, OnDestroy {
       mapInfo: (info) => {
         // MOCK
         //(info as any).asicTemps = [50, 51, 52, 53, 54, 55, 53, 51];
+
+        // Browser-local display overrides (max A / max W) for the bars.
+        this.uiPrefs.applyToInfo(info);
 
         // Normalize/derive everything the tiles need (bars + squares).
         const derived = normalizeHomeTileInfo(info, {

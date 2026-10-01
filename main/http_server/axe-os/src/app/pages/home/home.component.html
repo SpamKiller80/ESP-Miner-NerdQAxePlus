@@ -486,8 +486,8 @@
 
                   <!-- Power bar (full width under the 3 bars + square) -->
                   <div class="power-bar power-bar--full" role="img"
-                       [class.power-bar--warn]="info.power.max ? isBarWarn(info.power.watts, info.power.min ?? 0, info.power.max) : false"
-                       [class.power-bar--crit]="info.power.max ? isBarCrit(info.power.watts, info.power.min ?? 0, info.power.max) : false"
+                       [class.power-bar--warn]="info.power.max ? isPowerWarn(info.power.watts, info.power.min ?? 0, info.power.max) : false"
+                       [class.power-bar--crit]="info.power.max ? isPowerCrit(info.power.watts, info.power.min ?? 0, info.power.max) : false"
                        [class.power-bar--max]="info.power.max ? isBarMax(info.power.watts, info.power.max) : false"
                        [attr.aria-label]="('PERFORMANCE.POWER' | translate) + ': ' + (info.power.watts | number: '1.1-1') + ' W'">
                     <div class="power-bar__fill"

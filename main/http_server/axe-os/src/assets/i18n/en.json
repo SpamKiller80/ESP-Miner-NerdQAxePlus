@@ -601,5 +601,17 @@
     "COINBASE_MAX_FEE": "Max pool fee",
     "COINBASE_MAX_FEE_HINT": "Verification fails if the pool's share of the coinbase reward exceeds this percentage (e.g. 3 for ckpool's 3% fee).",
     "COINBASE_RECONNECT_HINT": "Saving will briefly disconnect and reconnect to the pool to apply the new settings."
+  },
+  "DISPLAY": {
+    "TITLE": "Display (this browser only)",
+    "HINT": "Stored locally in your browser, not on the miner. Leave empty to use the device values / defaults.",
+    "ACCENT": "Accent color",
+    "MAX_CURRENT": "Max input current (A)",
+    "MAX_POWER": "Max power (W)",
+    "DEVICE_DEFAULT": "Device default",
+    "WARN_PCT": "Yellow from (%)",
+    "CRIT_PCT": "Red from (%)",
+    "RESET": "Reset",
+    "SAVED": "Display saved (reload for chart color)"
   }
 }

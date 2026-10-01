@@ -27,6 +27,9 @@
     </nb-action>
     -->
   </nb-actions>
+  <nb-select [selected]="accentId" (selectedChange)="changeAccent($event)" status="primary" class="mr-2">
+    <nb-option *ngFor="let a of accents" [value]="a.id">● {{ a.name }}</nb-option>
+  </nb-select>
   <nb-select [selected]="currentTheme" (selectedChange)="changeTheme($event)" status="primary">
     <nb-option *ngFor="let theme of themes" [value]="theme.value"> {{ theme.name }}</nb-option>
   </nb-select>

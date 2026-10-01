@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { Store } from '@ngrx/store';
 import * as fromI18n from './@i18n/reducers';
+import { UiPrefsService } from './services/ui-prefs.service';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,9 @@ export class AppComponent {
 
   constructor(
     private translate: TranslateService,
-    private store: Store<fromI18n.State>
+    private store: Store<fromI18n.State>,
+    // Injected for its side effect: applies the saved accent color at startup.
+    private uiPrefs: UiPrefsService
   ) {
     // Set available languages
     translate.addLangs(['en', 'fr', 'es', 'de', 'it', 'ro', 'pl', 'da', 'zh-CN']);

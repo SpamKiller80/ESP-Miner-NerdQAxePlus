@@ -601,5 +601,17 @@
     "COINBASE_MAX_FEE": "Max. Pool-Gebühr",
     "COINBASE_MAX_FEE_HINT": "Die Verifizierung schlägt fehl, wenn der Pool-Anteil an der Coinbase-Belohnung diesen Prozentsatz überschreitet (z. B. 3 für ckpools 3 % Gebühr).",
     "COINBASE_RECONNECT_HINT": "Beim Speichern wird die Verbindung zum Pool kurz getrennt und neu aufgebaut, um die neuen Einstellungen zu übernehmen."
+  },
+  "DISPLAY": {
+    "TITLE": "Anzeige (nur dieser Browser)",
+    "HINT": "Wird lokal im Browser gespeichert, nicht im Miner. Leer lassen = Werte des Geräts bzw. Standard.",
+    "ACCENT": "Akzentfarbe",
+    "MAX_CURRENT": "Max. Eingangsstrom (A)",
+    "MAX_POWER": "Max. Leistung (W)",
+    "DEVICE_DEFAULT": "Geräte-Standard",
+    "WARN_PCT": "Gelb ab (%)",
+    "CRIT_PCT": "Rot ab (%)",
+    "RESET": "Zurücksetzen",
+    "SAVED": "Anzeige gespeichert (Seite neu laden für Diagramm-Farbe)"
   }
 }

@@ -4,6 +4,7 @@ import { LayoutService } from '../../../@core/utils.ts';
 import { SystemService } from '../../../services/system.service';
 import { map, takeUntil } from 'rxjs/operators';
 import { Subject, Observable } from 'rxjs';
+import { UiPrefsService, ACCENT_PRESETS } from '../../../services/ui-prefs.service';
 import { IIdentifyV2 } from 'src/app/models/IIdentifyV2';
 
 @Component({
@@ -28,6 +29,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     { value: 'dark',    name: 'Dark' },
   ];
 
+  accents = ACCENT_PRESETS;
+  accentId = 'theme';
+
   currentTheme = 'cosmic';  // Default theme if none is found in localStorage
   logoPath: string = '';    // Resolved logo path for the template
   logoFailed: boolean = false;
@@ -47,8 +51,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private themeService: NbThemeService,
     private layoutService: LayoutService,
     private breakpointService: NbMediaBreakpointsService,
-    private infoService: SystemService
+    private infoService: SystemService,
+    private uiPrefs: UiPrefsService,
   ) {
+    this.accentId = this.uiPrefs.getAccentId();
     this.setPlaceholderLogo();
   }
 
@@ -117,6 +123,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.updateLogo();
       if (!savedTheme) this.saveThemeToLocalStorage(this.currentTheme);
     });
+  }
+
+  changeAccent(id: string) {
+    this.accentId = id;
+    this.uiPrefs.setAccent(id);
   }
 
   changeTheme(themeName: string) {
