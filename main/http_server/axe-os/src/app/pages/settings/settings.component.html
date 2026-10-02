@@ -1,6 +1,6 @@
 <!-- update.component.html -->
 
-<nb-card *ngIf="currentWebVersion !== '' && currentVersion !== currentWebVersion" class="alert-box">
+<nb-card *ngIf="currentWebVersion !== '' && currentWebVersion.startsWith('v') && currentVersion !== currentWebVersion" class="alert-box">
 Version mismatch!<br/><br/>
 Firmware: {{ currentVersion }}<br/>
 Web-UI: {{ currentWebVersion }}<br/>
