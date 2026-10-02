@@ -53,6 +53,14 @@ const LS_THRESHOLDS = 'ui.thresholds.v1';
 // Nebular (cosmic) alphas for the --color-primary-transparent-* variables.
 const TRANSPARENT_ALPHAS: Record<number, number> = { 100: 0.08, 200: 0.16, 300: 0.24, 400: 0.32, 500: 0.4, 600: 0.48 };
 
+// Original (purple-tinted) neutral palette of the "cosmic" theme. We keep lightness/saturation
+// and only rotate the hue, so backgrounds, cards and borders follow the accent color too.
+const COSMIC_BASIC: Record<number, string> = {
+  100: '#ffffff', 200: '#f7f7fc', 300: '#f0f0fa', 400: '#e1e1f2', 500: '#ceceeb', 600: '#b4b4db',
+  700: '#6a6a94', 800: '#323259', 900: '#252547', 1000: '#1b1b38', 1100: '#13132b',
+};
+const STYLE_ID = 'ui-accent-style';
+
 /** Lightness offsets relative to the base (500) shade. 100..400 are lighter, 600..900 darker. */
 const SHADE_L: Record<number, (baseL: number) => number> = {
   100: () => 98,
@@ -95,6 +103,14 @@ function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: n
   return { h, s: s * 100, l: l * 100 };
 }
 
+function hsl2rgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+  s /= 100; l /= 100;
+  const k = (n: number) => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return { r: Math.round(f(0) * 255), g: Math.round(f(8) * 255), b: Math.round(f(4) * 255) };
+}
+
 function hsl(h: number, s: number, l: number): string {
   return `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(Math.max(4, Math.min(99, l)))}%)`;
 }
@@ -133,6 +149,8 @@ export class UiPrefsService {
 
     const shades = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 
+    this.applyBackground(preset.base);
+
     if (!preset.base) {
       for (const s of shades) style.removeProperty(`--color-primary-${s}`);
       for (const s of Object.keys(TRANSPARENT_ALPHAS)) style.removeProperty(`--color-primary-transparent-${s}`);
@@ -153,6 +171,39 @@ export class UiPrefsService {
 
     // Chart line color (read once when the dashboard chart is built).
     (HOME_CFG.colors as any).hashrateBase = preset.base;
+  }
+
+  /** Rotate the hue of the cosmic theme's neutral palette (only active while the cosmic theme is selected). */
+  private applyBackground(base: string | null): void {
+    let el = document.getElementById(STYLE_ID) as HTMLStyleElement | null;
+    if (!base) {
+      el?.remove();
+      return;
+    }
+    const { r, g, b } = hexToRgb(base);
+    const targetHue = rgbToHsl(r, g, b).h;
+    const rotate = (hex: string): { css: string; r: number; g: number; b: number } => {
+      const c = hexToRgb(hex);
+      const x = rgbToHsl(c.r, c.g, c.b);
+      const out = hsl2rgb(targetHue, x.s, x.l);
+      return { css: `rgb(${out.r}, ${out.g}, ${out.b})`, ...out };
+    };
+    const lines: string[] = [];
+    for (const [shade, hex] of Object.entries(COSMIC_BASIC)) {
+      lines.push(`--color-basic-${shade}: ${rotate(hex).css};`);
+    }
+    const mid = rotate(COSMIC_BASIC[600]);
+    for (const [shade, alpha] of Object.entries(TRANSPARENT_ALPHAS)) {
+      lines.push(`--color-basic-transparent-${shade}: rgba(${mid.r}, ${mid.g}, ${mid.b}, ${alpha});`);
+    }
+    const dark = rotate(COSMIC_BASIC[900]);
+    lines.push(`--slide-out-background: ${dark.css};`);
+    if (!el) {
+      el = document.createElement('style');
+      el.id = STYLE_ID;
+      document.head.appendChild(el);
+    }
+    el.textContent = `body.nb-theme-cosmic { ${lines.join(' ')} }`;
   }
 
   // ---- thresholds ---------------------------------------------------------
